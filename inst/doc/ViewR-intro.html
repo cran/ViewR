@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting Started with ViewR</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting Started with ViewR</h1>
+
+
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p><strong>ViewR</strong> brings spreadsheet-style data exploration
+directly into your R workflow. A single function call opens a polished,
+popup-based interface that lets you filter, sort, search, edit, and
+understand any <code>data.frame</code> — and automatically writes the
+equivalent <code>dplyr</code> code so you never lose
+reproducibility.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(ViewR)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">ViewR</span>(mtcars)</span></code></pre></div>
+<hr />
+</div>
+<div id="the-viewr-function" class="section level2">
+<h2>The <code>ViewR()</code> function</h2>
+<p>The entire interface is controlled through one function:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">ViewR</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  data,</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">edit          =</span> <span class="cn">FALSE</span>,   <span class="co"># enable Excel-like editing</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">popup         =</span> <span class="cn">TRUE</span>,    <span class="co"># open as modal dialog</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="at">labels        =</span> <span class="cn">NULL</span>,    <span class="co"># named vector of variable labels</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="at">title         =</span> <span class="cn">NULL</span>,    <span class="co"># custom window title</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">viewer        =</span> <span class="st">&quot;dialog&quot;</span>,<span class="co"># &quot;dialog&quot;, &quot;browser&quot;, or &quot;pane&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="at">generate_code =</span> <span class="cn">TRUE</span>,    <span class="co"># show R Code tab</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="at">theme         =</span> <span class="st">&quot;flatly&quot;</span>,<span class="co"># Bootstrap theme</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="at">max_display   =</span> <span class="dv">50000</span><span class="dt">L</span>,  <span class="co"># row cap for rendering</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="at">return_data   =</span> <span class="cn">TRUE</span>     <span class="co"># return (possibly edited) data on close</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>)</span></code></pre></div>
+<p><code>ViewR()</code> is <strong>pipe-friendly</strong> and returns
+the (possibly modified) data frame invisibly when the user clicks
+<em>Done</em>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>clean_data <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="fu">filter</span>(cyl <span class="sc">&gt;=</span> <span class="dv">4</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="fu">ViewR</span>(<span class="at">edit =</span> <span class="cn">TRUE</span>)   <span class="co"># open popup; result assigned on Done</span></span></code></pre></div>
+<hr />
+</div>
+<div id="walkthrough-of-the-interface" class="section level2">
+<h2>Walkthrough of the interface</h2>
+<div id="sidebar" class="section level3">
+<h3>Sidebar</h3>
+<p>The left-hand sidebar provides three action panels that update the
+data display in real time.</p>
+<div id="filters" class="section level4">
+<h4>Filters</h4>
+<p>Click the green <strong>+</strong> button to add a filter condition.
+Each row has:</p>
+<table>
+<colgroup>
+<col width="52%" />
+<col width="47%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Control</th>
+<th>Options</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Column</td>
+<td>any column in the data</td>
+</tr>
+<tr class="even">
+<td>Operator</td>
+<td><code>==</code>, <code>!=</code>, <code>&gt;</code>,
+<code>&gt;=</code>, <code>&lt;</code>, <code>&lt;=</code>,
+<em>contains</em>, <em>starts with</em>, <em>ends with</em>, <em>is
+NA</em>, <em>is not NA</em></td>
+</tr>
+<tr class="odd">
+<td>Value</td>
+<td>free-text input</td>
+</tr>
+<tr class="even">
+<td>Logic</td>
+<td><strong>AND</strong> (default) or <strong>OR</strong> (shown from
+the second row onward)</td>
+</tr>
+</tbody>
+</table>
+<p>You can add as many filter rows as you need. Click <strong>Clear
+all</strong> to remove all filters at once.</p>
+</div>
+<div id="sort" class="section level4">
+<h4>Sort</h4>
+<p>Add one or more sort levels. Each level has a column and a direction
+(ascending ↑ or descending ↓). Levels are applied in order — the first
+is the primary sort key, the second is the tiebreaker, and so on.</p>
+</div>
+<div id="columns" class="section level4">
+<h4>Columns</h4>
+<p>Tick or untick columns to show or hide them. The <strong>All</strong>
+/ <strong>None</strong> links act as bulk toggles.</p>
+<hr />
+</div>
+</div>
+<div id="main-tabs" class="section level3">
+<h3>Main tabs</h3>
+<div id="data" class="section level4">
+<h4>Data</h4>
+<p>The main data table is powered by the <strong>DT</strong> package. It
+supports:</p>
+<ul>
+<li><strong>Global search</strong> (top-right of the table)</li>
+<li><strong>Per-column filter boxes</strong> below each header</li>
+<li>Clickable column headers for one-click ascending/descending
+sort</li>
+<li>Configurable page length (use the <em>Rows per page</em> slider in
+the sidebar)</li>
+</ul>
+<p>If you supply <code>labels</code> (or use a dataset imported with
+<strong>haven</strong>), each column header will show an ⓘ tooltip with
+the full label when you hover.</p>
+</div>
+<div id="edit-requires-edit-true" class="section level4">
+<h4>Edit <em>(requires <code>edit = TRUE</code>)</em></h4>
+<p>An Excel-like grid powered by <strong>rhandsontable</strong>. You
+can:</p>
+<ul>
+<li>Click any cell and type to edit its value directly</li>
+<li>Right-click a row header for insert / remove options</li>
+<li>Use the <strong>Add Row</strong> button to append a blank row</li>
+<li><strong>Undo</strong> and <strong>Redo</strong> (unlimited) step
+through the change history</li>
+</ul>
+<p>Changes are committed to the returned data frame when you click
+<strong>Done</strong>.</p>
+<blockquote>
+<p><strong>Tip:</strong> Clear all filters and sorts before editing to
+ensure row positions map correctly back to the original data.</p>
+</blockquote>
+</div>
+<div id="find-replace" class="section level4">
+<h4>Find &amp; Replace</h4>
+<p>Search for any text pattern — literal or regex — and replace it in
+one or all columns. The workflow is:</p>
+<ol style="list-style-type: decimal">
+<li>Choose a column (or <em>All columns</em>) from the dropdown.</li>
+<li>Type the <strong>Find</strong> string and the <strong>Replace
+with</strong> string.</li>
+<li>Optionally tick <em>Case sensitive</em>, <em>Regex</em>, or
+<em>Exact cell match</em>.</li>
+<li>Click <strong>Preview</strong> to see a diff table of affected
+cells.</li>
+<li>Click <strong>Apply</strong> to commit the replacement.</li>
+</ol>
+</div>
+<div id="variable-info" class="section level4">
+<h4>Variable Info</h4>
+<p>A summary table for every column in the current working data:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Type</td>
+<td>R class (character, integer, numeric, …)</td>
+</tr>
+<tr class="even">
+<td>N</td>
+<td>Count of non-missing values</td>
+</tr>
+<tr class="odd">
+<td>Missing</td>
+<td>Count of NA values</td>
+</tr>
+<tr class="even">
+<td>Missing %</td>
+<td>Percentage missing (colour-bar visualised)</td>
+</tr>
+<tr class="odd">
+<td>Unique</td>
+<td>Number of distinct values</td>
+</tr>
+<tr class="even">
+<td>Min / Max</td>
+<td>For numeric columns</td>
+</tr>
+<tr class="odd">
+<td>Sample values</td>
+<td>Up to 4 example values</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="r-code" class="section level4">
+<h4>R Code</h4>
+<p>Every action you perform — filtering, sorting, showing/hiding
+columns, find-and-replace — is translated into a <strong>dplyr</strong>
+pipeline and displayed here in real time:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>mtcars_result <span class="ot">&lt;-</span> mtcars <span class="sc">|&gt;</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    <span class="st">`</span><span class="at">cyl</span><span class="st">`</span> <span class="sc">==</span> <span class="st">&quot;6&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="st">`</span><span class="at">mpg</span><span class="st">`</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">`</span><span class="at">mpg</span><span class="st">`</span>, <span class="st">`</span><span class="at">cyl</span><span class="st">`</span>, <span class="st">`</span><span class="at">hp</span><span class="st">`</span>, <span class="st">`</span><span class="at">wt</span><span class="st">`</span>)</span></code></pre></div>
+<p>Click <strong>Copy to clipboard</strong> to paste the code directly
+into your script. Click <strong>Reset</strong> to clear the history of
+find-replace and edit operations (filter/sort/column code is always live
+and cannot be cleared independently).</p>
+<hr />
+</div>
+</div>
+</div>
+<div id="variable-labels" class="section level2">
+<h2>Variable labels</h2>
+<p>ViewR automatically reads variable labels stored as column
+attributes, as produced by <strong>haven</strong>,
+<strong>labelled</strong>, or <strong>Hmisc</strong>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># df &lt;- haven::read_sav(&quot;my_survey.sav&quot;)</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co"># ViewR(df)   # labels appear as tooltips automatically</span></span></code></pre></div>
+<p>You can also supply labels manually:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">ViewR</span>(mtcars,</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">c</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>        <span class="at">mpg  =</span> <span class="st">&quot;Miles per Gallon&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>        <span class="at">cyl  =</span> <span class="st">&quot;Number of Cylinders&quot;</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>        <span class="at">disp =</span> <span class="st">&quot;Displacement (cu.in.)&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>        <span class="at">hp   =</span> <span class="st">&quot;Gross Horsepower&quot;</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>        <span class="at">wt   =</span> <span class="st">&quot;Weight (1000 lbs)&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>      ))</span></code></pre></div>
+<hr />
+</div>
+<div id="themes" class="section level2">
+<h2>Themes</h2>
+<p>Choose from any Bootstrap theme supported by
+<strong>shinythemes</strong>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">ViewR</span>(iris, <span class="at">theme =</span> <span class="st">&quot;darkly&quot;</span>)    <span class="co"># dark</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="fu">ViewR</span>(iris, <span class="at">theme =</span> <span class="st">&quot;cerulean&quot;</span>)  <span class="co"># light blue</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a><span class="fu">ViewR</span>(iris, <span class="at">theme =</span> <span class="st">&quot;cosmo&quot;</span>)     <span class="co"># clean &amp; minimal</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="fu">ViewR</span>(iris, <span class="at">theme =</span> <span class="st">&quot;sandstone&quot;</span>) <span class="co"># warm beige</span></span></code></pre></div>
+<hr />
+</div>
+<div id="opening-in-the-browser-or-viewer-pane" class="section level2">
+<h2>Opening in the browser or Viewer pane</h2>
+<p>By default ViewR opens as a modal dialog inside RStudio. Use the
+<code>viewer</code> argument to change this:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># Open in the system browser (useful for large datasets)</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">ViewR</span>(iris, <span class="at">viewer =</span> <span class="st">&quot;browser&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># Open in the RStudio Viewer pane</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="fu">ViewR</span>(iris, <span class="at">viewer =</span> <span class="st">&quot;pane&quot;</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co"># Or equivalently, set popup = FALSE (defaults to browser)</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="fu">ViewR</span>(iris, <span class="at">popup =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<hr />
+</div>
+<div id="editing-data-and-returning-results" class="section level2">
+<h2>Editing data and returning results</h2>
+<p>When <code>edit = TRUE</code>, clicking <strong>Done</strong> returns
+the modified data frame:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Open the editor; assign the result</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>corrected <span class="ot">&lt;-</span> <span class="fu">ViewR</span>(survey_data, <span class="at">edit =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="co"># &#39;corrected&#39; now contains all inline edits + any find-replace operations</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="fu">head</span>(corrected)</span></code></pre></div>
+<p>If you click <strong>Cancel</strong>, the original unmodified data
+frame is returned.</p>
+<hr />
+</div>
+<div id="full-example-survey-data-workflow" class="section level2">
+<h2>Full example: survey data workflow</h2>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">library</span>(ViewR)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co"># Load a dataset (here we use the built-in survey proxy)</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">data</span>(Titanic)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>titanic_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(Titanic)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co"># Step 1 — Explore: inspect variable info and browse the data</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">ViewR</span>(titanic_df,</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>      <span class="at">labels =</span> <span class="fu">c</span>(<span class="at">Class    =</span> <span class="st">&quot;Passenger Class&quot;</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>                 <span class="at">Sex      =</span> <span class="st">&quot;Passenger Sex&quot;</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>                 <span class="at">Age      =</span> <span class="st">&quot;Age Group&quot;</span>,</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>                 <span class="at">Survived =</span> <span class="st">&quot;Survival Status&quot;</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>                 <span class="at">Freq     =</span> <span class="st">&quot;Count&quot;</span>),</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>      <span class="at">theme  =</span> <span class="st">&quot;flatly&quot;</span>)</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a><span class="co"># Step 2 — Clean: use Find &amp; Replace inside the popup to</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a><span class="co">#   standardise &quot;Male&quot; -&gt; &quot;M&quot;, &quot;Female&quot; -&gt; &quot;F&quot;</span></span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="co"># Step 3 — Filter &amp; export: the R Code tab will have generated:</span></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="co">#   titanic_df_result &lt;- titanic_df |&gt;</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a><span class="co">#     filter(`Survived` == &quot;Yes&quot;) |&gt;</span></span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a><span class="co">#     arrange(desc(`Freq`))</span></span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a><span class="co"># Copy, paste, and run!</span></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a><span class="co"># Step 4 — Edit specific cells if needed</span></span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a>titanic_clean <span class="ot">&lt;-</span> <span class="fu">ViewR</span>(titanic_df, <span class="at">edit =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<hr />
+</div>
+<div id="session-info" class="section level2">
+<h2>Session info</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co">#&gt; R version 4.5.2 (2025-10-31)</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co">#&gt; Platform: aarch64-apple-darwin20</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt; Running under: macOS Tahoe 26.4.1</span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt; Matrix products: default</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; BLAS:   /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib </span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/4.5-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.1</span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; locale:</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; [1] C/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; time zone: Asia/Kolkata</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt; tzcode source: internal</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt; attached base packages:</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt;  [1] digest_0.6.39     R6_2.6.1          fastmap_1.2.0     xfun_0.57        </span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt;  [5] cachem_1.1.0      knitr_1.51        htmltools_0.5.9   rmarkdown_2.31   </span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="co">#&gt;  [9] lifecycle_1.0.5   cli_3.6.5         sass_0.4.10       jquerylib_0.1.4  </span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="co">#&gt; [13] compiler_4.5.2    rstudioapi_0.18.0 tools_4.5.2       evaluate_1.0.5   </span></span>
+<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a><span class="co">#&gt; [17] bslib_0.10.0      yaml_2.3.12       otel_0.2.0        jsonlite_2.0.0   </span></span>
+<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a><span class="co">#&gt; [21] rlang_1.2.0</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
