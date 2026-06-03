@@ -3,9 +3,11 @@
 \docType{package}
 \name{ViewR-package}
 \alias{ViewR-package}
-\title{ViewR: Interactive Data Viewer, Filter, and Editor}
+\title{ViewR: Advanced Interactive Data Tables and Data Explorer}
 \description{
-Provides a feature-rich, popup-based interactive interface for viewing, exploring, filtering, sorting, editing, analysing, and plotting R data frames. Key features include: a searchable, paginated data table with drag-and-drop column reordering and variable-label 'tooltips'; multi-condition filters (AND/OR) with live preview; multi-column sorting; column visibility management with search; an Excel-like cell editor powered by 'rhandsontable'; find-and-replace across one or all columns (literal or regex) with automatic live preview; a Plots tab with auto-detected histograms and bar charts for every column; automatic 'dplyr' code generation reflecting every operation performed in the 'UI'; one-click CSV export; and a Variable Info tab with type, missing values, and summary statistics. The entire interface is launched with a single call to ViewR() and works as a popup dialog, in the 'RStudio' Viewer pane, or in the system browser.
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
+An advanced, interactive data table and data explorer for R, delivered as a modern, self-contained 'htmlwidget' with a high-performance virtualized grid. ViewR renders 'Kaggle'-style micro-dashboard column headers complete with data-type badges, mini distribution spark-histograms, and data-completeness (missingness) bars. It provides hover metadata cards, a sliding Data Insights drawer with interactive histograms and 'Pareto' category charts, a multi-condition visual query builder (AND/OR), a column visibility picker, and a reproducible code generator that emits 'dplyr', base R, and 'SQL' that matches the active filter and column state. The interface is implemented entirely in dependency-free vanilla 'JavaScript' (no 'React' or build toolchain) and works in the 'RStudio'/'Positron' Viewer, inside 'Shiny' apps, in 'R Markdown'/'Quarto', or as a portable standalone 'HTML' file. A single call to viewr() opens the explorer; the legacy 'Shiny'-gadget ViewR() editor remains available.
 }
 \seealso{
 Useful links:
@@ -18,6 +20,11 @@ Useful links:
 }
 \author{
 \strong{Maintainer}: Mahesh Divakaran \email{imaheshdivakaran@gmail.com}
+
+Authors:
+\itemize{
+  \item Mahesh Divakaran \email{imaheshdivakaran@gmail.com}
+}
 
 }
 \keyword{internal}

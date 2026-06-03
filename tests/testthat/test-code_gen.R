@@ -198,16 +198,14 @@ test_that(".vr_build_code appends find-replace mutate ops", {
   expect_true(grepl("gsub", out))
 })
 
-test_that(".vr_build_code emits edit ops as R statements after the pipe", {
-  edit_stmt <- 'dat_result[1, "x"] <- 42L'
+test_that(".vr_build_code wraps edit ops in comments", {
   out <- ViewR:::.vr_build_code(
     data_name    = "dat",
     filters      = list(),
     sorts        = list(),
     visible_cols = c("x"),
     all_cols     = c("x"),
-    edit_ops     = edit_stmt
+    edit_ops     = "Row added"
   )
-  expect_true(grepl('dat_result <- dat', out, fixed = TRUE))
-  expect_true(grepl('dat_result[1, "x"] <- 42L', out, fixed = TRUE))
+  expect_true(grepl("# Row added", out))
 })

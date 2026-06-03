@@ -9,6 +9,16 @@ knitr::opts_chunk$set(
 # library(ViewR)
 # ViewR(mtcars)
 
+## ----cran-install, eval=FALSE-------------------------------------------------
+# install.packages("ViewR")
+
+## ----github-install, eval=FALSE-----------------------------------------------
+# # install.packages("remotes")
+# remotes::install_github("imaheshdivakaran/ViewR")
+
+## ----deps, eval=FALSE---------------------------------------------------------
+# install_viewr_deps()
+
 ## ----signature----------------------------------------------------------------
 # ViewR(
 #   data,

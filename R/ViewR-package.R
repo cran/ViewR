@@ -3,13 +3,12 @@
 
 ## usethis namespace: start
 #' @importFrom shiny actionButton checkboxGroupInput checkboxInput column
-#'   conditionalPanel debounce div downloadButton downloadHandler fluidPage
-#'   fluidRow h5 icon insertUI isolate observe observeEvent outputOptions
-#'   plotOutput radioButtons reactive reactiveValues removeUI renderPlot
-#'   renderPrint renderText runGadget selectInput shinyApp showNotification
-#'   sliderInput stopApp tabPanel tabsetPanel tagList tags textInput
-#'   updateCheckboxGroupInput updateSelectInput updateSliderInput wellPanel
-#'   browserViewer dialogViewer paneViewer br verbatimTextOutput req HTML
+#'   conditionalPanel div fluidPage fluidRow h5 icon insertUI observeEvent
+#'   observe outputOptions reactive reactiveValues removeUI renderText
+#'   runGadget selectInput shinyApp showNotification sliderInput stopApp
+#'   tabPanel tabsetPanel tagList tags textInput updateCheckboxGroupInput
+#'   wellPanel browserViewer dialogViewer paneViewer br verbatimTextOutput
+#'   isolate req HTML
 #' @importFrom DT datatable dataTableOutput renderDataTable formatStyle
 #'   styleColorBar
 #' @importFrom rhandsontable rhandsontable rHandsontableOutput
@@ -18,8 +17,7 @@
 #' @importFrom shinythemes shinytheme
 #' @importFrom htmltools htmlEscape withTags tags
 #' @importFrom jsonlite toJSON
-#' @importFrom graphics barplot boxplot hist par plot.new rug text
 #' @importFrom stats setNames
-#' @importFrom utils head write.csv
+#' @importFrom utils head
 ## usethis namespace: end
 NULL

@@ -51,7 +51,7 @@
 #'     \item{\code{"pane"}}{RStudio Viewer pane.}
 #'   }
 #' @param generate_code Logical. Show the R Code tab. Default \code{TRUE}.
-#' @param theme         Bootstrap theme for the 'UI'.  One of
+#' @param theme         Bootstrap theme for the UI.  One of
 #'                      \code{"flatly"} (default), \code{"cerulean"},
 #'                      \code{"cosmo"}, \code{"darkly"}, \code{"lumen"},
 #'                      \code{"paper"}, \code{"readable"}, \code{"sandstone"},
@@ -70,18 +70,26 @@
 #' @export
 #'
 #' @examples
-#' if (interactive()) {
-#'   ViewR(mtcars)
+#' \dontrun{
+#' ## -- Basic view ------------------------------------------------------------
+#' ViewR(mtcars)
 #'
-#'   new_iris <- ViewR(iris, edit = TRUE)
+#' ## -- Edit mode: returns modified data -------------------------------------
+#' new_iris <- ViewR(iris, edit = TRUE)
 #'
-#'   ViewR(mtcars,
-#'         labels = c(mpg = "Miles per Gallon",
-#'                    cyl = "Number of Cylinders",
-#'                    hp  = "Gross Horsepower"),
-#'         theme  = "darkly")
+#' ## -- Custom labels + dark theme --------------------------------------------
+#' ViewR(mtcars,
+#'       labels = c(mpg = "Miles per Gallon",
+#'                  cyl = "Number of Cylinders",
+#'                  hp  = "Gross Horsepower"),
+#'       theme  = "darkly")
 #'
-#'   ViewR(iris, viewer = "browser", generate_code = TRUE)
+#' ## -- Open in the system browser --------------------------------------------
+#' ViewR(iris, viewer = "browser", generate_code = TRUE)
+#'
+#' ## -- View a haven-imported dataset (labels read automatically) -------------
+#' # df <- haven::read_sav("my_survey.sav")
+#' # ViewR(df)
 #' }
 ViewR <- function(data,
                   edit          = FALSE,
@@ -124,8 +132,7 @@ ViewR <- function(data,
 
   # -- Build Shiny app ---------------------------------------------------------
   app <- shiny::shinyApp(
-    ui     = .vr_ui(data, title, theme, isTRUE(edit), isTRUE(generate_code),
-                    n_rows = nrow(data)),
+    ui     = .vr_ui(data, title, theme, isTRUE(edit), isTRUE(generate_code)),
     server = .vr_server(data, data_name, resolved_labels,
                         isTRUE(edit), isTRUE(generate_code),
                         as.integer(max_display))
@@ -154,4 +161,60 @@ ViewR <- function(data,
   } else {
     invisible(data)
   }
+}
+
+
+# =============================================================================
+# install_viewr_deps()
+# =============================================================================
+
+#' Install All ViewR Dependencies
+#'
+#' Checks which required packages are missing from the user's library and
+#' installs them via \code{\link[utils]{install.packages}}.
+#'
+#' @param ask Logical. If \code{TRUE} (default), prompt before installing.
+#'
+#' @return Invisibly returns a character vector of packages that were (or
+#'   needed to be) installed.
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' install_viewr_deps()
+#' }
+install_viewr_deps <- function(ask = TRUE) {
+  required <- c(
+    "shiny", "miniUI", "DT", "rhandsontable",
+    "shinyjs", "shinythemes", "htmltools", "jsonlite"
+  )
+
+  missing_pkgs <- required[!vapply(required, function(p)
+    requireNamespace(p, quietly = TRUE), logical(1))]
+
+  if (length(missing_pkgs) == 0) {
+    message("All ViewR dependencies are already installed. \u2713")
+    return(invisible(character(0)))
+  }
+
+  message("The following packages are required but not installed:\n  ",
+          paste(missing_pkgs, collapse = ", "))
+
+  do_install <- if (ask && interactive()) {
+    ans <- readline("Install now? [y/N] ")
+    grepl("^[yY]", ans)
+  } else {
+    TRUE
+  }
+
+  if (do_install) {
+    utils::install.packages(missing_pkgs)
+    message("Done! \u2713")
+  } else {
+    message("Skipped. Install manually with:\n  install.packages(",
+            deparse(missing_pkgs), ")")
+  }
+
+  invisible(missing_pkgs)
 }

@@ -30,6 +30,29 @@ ViewR(mtcars)
 
 ---
 
+## Installation
+
+Install the release version from CRAN:
+
+```{r cran-install, eval=FALSE}
+install.packages("ViewR")
+```
+
+Or install the development version from GitHub:
+
+```{r github-install, eval=FALSE}
+# install.packages("remotes")
+remotes::install_github("imaheshdivakaran/ViewR")
+```
+
+Run this helper to check and install all required dependencies:
+
+```{r deps, eval=FALSE}
+install_viewr_deps()
+```
+
+---
+
 ## The `ViewR()` function
 
 The entire interface is controlled through one function:

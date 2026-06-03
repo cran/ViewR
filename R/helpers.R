@@ -267,7 +267,7 @@
 
 # -- Dynamic UI row builders ---------------------------------------------------
 
-#' Build one filter row for the sidebar (two-row compact layout).
+#' Build one filter row for the sidebar.
 #' @noRd
 .vr_filter_row_ui <- function(fid, col_names, is_first) {
   ops <- c("==" , "!=" , ">" , ">=" , "<" , "<=" ,
@@ -277,46 +277,45 @@
     id    = paste0("filter_row_", fid),
     class = "vr-filter-row",
 
-    # Top row: [AND/OR (if not first)] + column + remove button
-    shiny::div(
-      class = "vr-filter-top",
-      if (!is_first) shiny::div(
-        style = "width:58px; flex-shrink:0;",
-        shiny::selectInput(paste0("f_logic_", fid), NULL,
-                           choices  = c("AND", "OR"),
-                           selected = "AND",
-                           width    = "100%")
-      ),
-      shiny::div(
-        style = "flex:1; min-width:0;",
-        shiny::selectInput(paste0("f_col_", fid), NULL,
-                           choices = col_names,
-                           width   = "100%")
-      ),
-      shiny::div(
-        style = "flex-shrink:0; padding-top:1px;",
-        shiny::actionButton(paste0("f_remove_", fid), NULL,
-                            icon  = shiny::icon("times"),
-                            class = "btn-xs btn-danger vr-icon-btn")
-      )
+    # AND / OR connector (hidden for the first filter)
+    if (!is_first) shiny::div(
+      style = "width:62px; flex-shrink:0;",
+      shiny::selectInput(paste0("f_logic_", fid), NULL,
+                         choices  = c("AND", "OR"),
+                         selected = "AND",
+                         width    = "100%")
     ),
 
-    # Bottom row: operator + value (value auto-hides for is NA / is not NA)
+    # Column
     shiny::div(
-      class = "vr-filter-bottom",
-      shiny::div(
-        style = "flex:1; min-width:0;",
-        shiny::selectInput(paste0("f_op_", fid), NULL,
-                           choices = ops,
-                           width   = "100%")
-      ),
-      shiny::div(
-        class = "vr-filter-val",
-        style = "flex:1; min-width:0;",
-        shiny::textInput(paste0("f_val_", fid), NULL,
-                         placeholder = "value\u2026",
-                         width       = "100%")
-      )
+      style = "flex:2; min-width:90px;",
+      shiny::selectInput(paste0("f_col_", fid), NULL,
+                         choices = col_names,
+                         width   = "100%")
+    ),
+
+    # Operator
+    shiny::div(
+      style = "flex:2; min-width:95px;",
+      shiny::selectInput(paste0("f_op_", fid), NULL,
+                         choices = ops,
+                         width   = "100%")
+    ),
+
+    # Value
+    shiny::div(
+      style = "flex:2; min-width:70px;",
+      shiny::textInput(paste0("f_val_", fid), NULL,
+                       placeholder = "value",
+                       width       = "100%")
+    ),
+
+    # Remove
+    shiny::div(
+      style = "flex-shrink:0; padding-top:1px;",
+      shiny::actionButton(paste0("f_remove_", fid), NULL,
+                          icon  = shiny::icon("times"),
+                          class = "btn-xs btn-danger vr-icon-btn")
     )
   )
 }
@@ -364,160 +363,6 @@
     x <- gsub(ch, paste0("\\", ch), x, fixed = TRUE)
   }
   x
-}
-
-
-# -- Plot renderer -------------------------------------------------------------
-
-#' Render a column-level plot (histogram, bar chart, or boxplot).
-#'
-#' @param d         data.frame (displayed / filtered)
-#' @param col_name  character column to plot
-#' @param plot_type one of "auto", "hist", "bar", "box"
-#' @param bins      number of histogram bins
-#' @noRd
-.vr_plot_col <- function(d, col_name, plot_type = "auto", bins = 30L) {
-  x       <- d[[col_name]]
-  n_na    <- sum(is.na(x))
-  x_clean <- x[!is.na(x)]
-
-  main_lbl <- if (n_na > 0L)
-    paste0(col_name, "  [", n_na, " NA]")
-  else
-    col_name
-
-  if (length(x_clean) == 0L) {
-    graphics::plot.new()
-    graphics::text(0.5, 0.5, "All values are NA", cex = 1.3, col = "gray60")
-    return(invisible(NULL))
-  }
-
-  is_num  <- is.numeric(x_clean)
-  n_uniq  <- length(unique(x_clean))
-
-  eff_type <- if (plot_type == "auto") {
-    if (is_num && n_uniq > 10L) "hist" else "bar"
-  } else {
-    plot_type
-  }
-
-  if (eff_type == "hist" && is_num) {
-    graphics::hist(
-      as.numeric(x_clean),
-      breaks = max(2L, as.integer(bins)),
-      col    = "#3498db",
-      border = "white",
-      main   = main_lbl,
-      xlab   = col_name,
-      las    = 1L
-    )
-    graphics::rug(as.numeric(x_clean), col = "#1a252f60")
-
-  } else if (eff_type == "box" && is_num) {
-    graphics::boxplot(
-      as.numeric(x_clean),
-      horizontal = TRUE,
-      col        = "#3498db",
-      border     = "#2c3e50",
-      main       = main_lbl,
-      xlab       = col_name
-    )
-
-  } else {
-    tab     <- sort(table(as.character(x)), decreasing = TRUE)
-    tab     <- utils::head(tab, 20L)
-    max_lbl <- max(nchar(names(tab)), 1L)
-    old_par <- graphics::par(
-      mar = c(3, min(max_lbl * 0.55, 14), 2.5, 0.5)
-    )
-    on.exit(graphics::par(old_par), add = TRUE)
-    graphics::barplot(
-      rev(tab),
-      horiz  = TRUE,
-      las    = 1L,
-      col    = "#3498db",
-      border = "white",
-      xlab   = "Count",
-      main   = main_lbl
-    )
-  }
-
-  invisible(NULL)
-}
-
-
-# -- R literal formatter -------------------------------------------------------
-
-#' Convert a scalar R value to its source-code literal representation.
-#' @noRd
-.vr_r_literal <- function(v) {
-  if (is.na(v)) {
-    if (is.integer(v))  return("NA_integer_")
-    if (is.numeric(v))  return("NA_real_")
-    if (is.logical(v))  return("NA")
-    return("NA_character_")
-  }
-  if (is.logical(v))  return(if (v) "TRUE" else "FALSE")
-  if (is.integer(v))  return(paste0(as.character(v), "L"))
-  if (is.numeric(v))  return(as.character(v))
-  paste0('"', gsub('"', '\\"', as.character(v), fixed = TRUE), '"')
-}
-
-
-# -- Edit code generator -------------------------------------------------------
-
-#' Diff orig_data against current_data and emit R statements that reproduce
-#' the changes (cell edits and appended rows).
-#'
-#' @param orig_data    original data.frame (never mutated by the app)
-#' @param current_data current s$data_work
-#' @param result_name  name of the result variable used in the code output
-#' @return character vector of R statements (empty if no changes)
-#' @noRd
-.vr_gen_edit_code <- function(orig_data, current_data, result_name) {
-  lines <- character(0)
-
-  n_orig  <- nrow(orig_data)
-  n_cur   <- nrow(current_data)
-  n_cmp   <- min(n_orig, n_cur)
-  shared  <- intersect(names(orig_data), names(current_data))
-
-  # Cell edits on pre-existing rows
-  if (n_cmp > 0L && length(shared) > 0L) {
-    for (col in shared) {
-      ov <- orig_data[[col]]
-      cv <- current_data[[col]]
-      for (i in seq_len(n_cmp)) {
-        o  <- ov[i]
-        cv_ <- cv[i]
-        changed <- if (is.na(o) && is.na(cv_)) FALSE
-                   else if (is.na(o) || is.na(cv_)) TRUE
-                   else !identical(o, cv_)
-        if (!changed) next
-        lines <- c(lines,
-          paste0(result_name, "[", i, ', "', col, '"] <- ',
-                 .vr_r_literal(cv_)))
-      }
-    }
-  }
-
-  # Appended rows
-  if (n_cur > n_orig) {
-    for (i in seq(n_orig + 1L, n_cur)) {
-      args <- vapply(names(current_data), function(col) {
-        paste0("  `", col, "` = ", .vr_r_literal(current_data[[col]][i]))
-      }, character(1))
-      lines <- c(lines, paste0(
-        result_name, " <- rbind(", result_name, ",\n",
-        "  data.frame(\n",
-        paste(args, collapse = ",\n"), ",\n",
-        "  stringsAsFactors = FALSE, check.names = FALSE\n",
-        "  ))"
-      ))
-    }
-  }
-
-  lines
 }
 
 
@@ -589,23 +434,17 @@ body { font-size: 13px !important; }
 }
 .vr-panel-header .pull-right { margin-left: auto; display:flex; gap:3px; }
 
-/* -- Filter rows (two-row compact layout) -- */
+/* -- Filter rows -- */
 .vr-filter-row {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  margin-bottom: 6px;
-  padding: 6px 7px;
-  background: ", row_bg, ";
-  border: 1px solid ", row_border, ";
-  border-radius: 4px;
-}
-.vr-filter-top,
-.vr-filter-bottom {
   display: flex;
   flex-wrap: nowrap;
   gap: 3px;
+  margin-bottom: 5px;
   align-items: flex-start;
+  padding: 5px 6px;
+  background: ", row_bg, ";
+  border: 1px solid ", row_border, ";
+  border-radius: 4px;
 }
 .vr-filter-row .form-group,
 .vr-sort-row   .form-group { margin-bottom: 0 !important; }
@@ -633,17 +472,9 @@ body { font-size: 13px !important; }
 /* -- Icon buttons -- */
 .vr-icon-btn { padding: 3px 7px !important; margin-top: 1px; }
 
-/* -- Column search input -- */
-.vr-col-search {
-  font-size: 12px !important;
-  height: 28px !important;
-  padding: 3px 8px !important;
-  margin-bottom: 5px;
-}
-
 /* -- Column checkbox list -- */
 .vr-col-list {
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
   padding: 2px 4px;
 }
@@ -666,22 +497,6 @@ body { font-size: 13px !important; }
   padding: 14px 16px;
   white-space: pre;
   overflow: auto;
-}
-
-/* -- Download button in topbar -- */
-.vr-dl-btn {
-  padding: 5px 10px !important;
-  line-height: 1.4 !important;
-}
-
-/* -- Plots tab -- */
-.vr-plot-summary pre {
-  font-size: 11.5px;
-  background: ", panel_bg, ";
-  border: 1px solid ", panel_border, ";
-  border-radius: 4px;
-  padding: 8px 10px;
-  margin-top: 8px;
 }
 
 /* -- Small helpers -- */

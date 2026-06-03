@@ -68,8 +68,8 @@
 #' Generate a dplyr::select() call for visible columns.
 #' @noRd
 .vr_gen_select_code <- function(visible_cols, all_cols) {
-  if (length(visible_cols) == 0)              return(NULL)
-  if (identical(visible_cols, all_cols))      return(NULL)   # Same cols, same order
+  if (setequal(visible_cols, all_cols)) return(NULL)   # No change
+  if (length(visible_cols) == 0)        return(NULL)
 
   col_str <- paste(paste0("`", visible_cols, "`"), collapse = ", ")
   paste0("select(", col_str, ")")
@@ -100,44 +100,35 @@
                             fnr_ops   = character(0),
                             edit_ops  = character(0)) {
 
-  pipe_steps <- character(0)
+  steps <- character(0)
 
   f_code <- .vr_gen_filter_code(filters)
-  if (!is.null(f_code)) pipe_steps <- c(pipe_steps, f_code)
+  if (!is.null(f_code)) steps <- c(steps, f_code)
 
   s_code <- .vr_gen_sort_code(sorts)
-  if (!is.null(s_code)) pipe_steps <- c(pipe_steps, s_code)
+  if (!is.null(s_code)) steps <- c(steps, s_code)
 
   sel_code <- .vr_gen_select_code(visible_cols, all_cols)
-  if (!is.null(sel_code)) pipe_steps <- c(pipe_steps, sel_code)
+  if (!is.null(sel_code)) steps <- c(steps, sel_code)
 
-  if (length(fnr_ops) > 0) pipe_steps <- c(pipe_steps, fnr_ops)
+  if (length(fnr_ops) > 0) steps <- c(steps, fnr_ops)
 
-  result_name <- paste0(data_name, "_result")
-  has_pipe    <- length(pipe_steps) > 0
-  has_edits   <- length(edit_ops)   > 0
+  if (length(edit_ops) > 0) {
+    steps <- c(steps, paste0("# ", edit_ops))
+  }
 
-  if (!has_pipe && !has_edits) {
+  if (length(steps) == 0) {
     return(paste0("# No operations applied yet.\n",
                   "# Use the Filters, Sort, Columns, Edit, or Find & Replace\n",
                   "# panels to generate reproducible R code here.\n\n",
                   data_name))
   }
 
-  out <- "library(dplyr)\n"
+  pipe_body <- paste(steps, collapse = " |>\n  ")
 
-  if (has_pipe) {
-    pipe_body <- paste(pipe_steps, collapse = " |>\n  ")
-    out <- paste0(out, "\n",
-                  result_name, " <- ", data_name, " |>\n",
-                  "  ", pipe_body)
-  } else {
-    out <- paste0(out, "\n", result_name, " <- ", data_name)
-  }
-
-  if (has_edits) {
-    out <- paste0(out, "\n\n", paste(edit_ops, collapse = "\n"))
-  }
-
-  out
+  paste0(
+    "library(dplyr)\n\n",
+    data_name, "_result <- ", data_name, " |>\n",
+    "  ", pipe_body
+  )
 }

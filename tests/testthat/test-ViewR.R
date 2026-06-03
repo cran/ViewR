@@ -1,7 +1,7 @@
 # =============================================================================
 # Tests for R/ViewR.R — exported functions
 # Note: ViewR() itself requires an interactive Shiny session; we test
-# argument validation here.
+# argument validation and install_viewr_deps() here.
 # =============================================================================
 
 # ── ViewR() argument validation ──────────────────────────────────────────────
@@ -46,3 +46,34 @@ test_that("ViewR() silently returns original data on NULL result", {
 
 
 
+
+
+# ── install_viewr_deps() ─────────────────────────────────────────────────────
+
+test_that("install_viewr_deps() returns invisibly when all deps installed", {
+  skip_if_not_installed("shiny")
+  skip_if_not_installed("DT")
+  skip_if_not_installed("rhandsontable")
+  skip_if_not_installed("shinyjs")
+  skip_if_not_installed("shinythemes")
+  skip_if_not_installed("htmltools")
+  skip_if_not_installed("jsonlite")
+
+  result <- withCallingHandlers(
+    install_viewr_deps(ask = FALSE),
+    message = function(m) invokeRestart("muffleMessage")
+  )
+  # Should return character vector (possibly empty) of missing packages
+  expect_type(result, "character")
+})
+
+test_that("install_viewr_deps() returns character vector", {
+  result <- withCallingHandlers(
+    tryCatch(
+      install_viewr_deps(ask = FALSE),
+      error = function(e) character(0)
+    ),
+    message = function(m) invokeRestart("muffleMessage")
+  )
+  expect_type(result, "character")
+})

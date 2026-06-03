@@ -44,7 +44,7 @@ Names must match column names of \code{data}. If
 
 \item{generate_code}{Logical. Show the R Code tab. Default \code{TRUE}.}
 
-\item{theme}{Bootstrap theme for the 'UI'.  One of
+\item{theme}{Bootstrap theme for the UI.  One of
 \code{"flatly"} (default), \code{"cerulean"},
 \code{"cosmo"}, \code{"darkly"}, \code{"lumen"},
 \code{"paper"}, \code{"readable"}, \code{"sandstone"},
@@ -96,17 +96,25 @@ are reflected in real-time as copy-pasteable \pkg{dplyr} code.
 }
 
 \examples{
-if (interactive()) {
-  ViewR(mtcars)
+\dontrun{
+## -- Basic view ------------------------------------------------------------
+ViewR(mtcars)
 
-  new_iris <- ViewR(iris, edit = TRUE)
+## -- Edit mode: returns modified data -------------------------------------
+new_iris <- ViewR(iris, edit = TRUE)
 
-  ViewR(mtcars,
-        labels = c(mpg = "Miles per Gallon",
-                   cyl = "Number of Cylinders",
-                   hp  = "Gross Horsepower"),
-        theme  = "darkly")
+## -- Custom labels + dark theme --------------------------------------------
+ViewR(mtcars,
+      labels = c(mpg = "Miles per Gallon",
+                 cyl = "Number of Cylinders",
+                 hp  = "Gross Horsepower"),
+      theme  = "darkly")
 
-  ViewR(iris, viewer = "browser", generate_code = TRUE)
+## -- Open in the system browser --------------------------------------------
+ViewR(iris, viewer = "browser", generate_code = TRUE)
+
+## -- View a haven-imported dataset (labels read automatically) -------------
+# df <- haven::read_sav("my_survey.sav")
+# ViewR(df)
 }
 }

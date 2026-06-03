@@ -1,47 +1,36 @@
-# ViewR 1.0.0
+# ViewR 2.0.0
 
-## New features
+## Major new architecture: the `viewdt()` data explorer widget
 
-* **Plots tab**: auto-detected visualisations for every column — histograms
-  (with rug) for continuous numerics, bar charts for categorical and
-  low-cardinality variables, and boxplots on demand. Configurable bin count
-  and a printed `summary()` panel accompany each plot.
+ViewR 2.0.0 introduces an entirely new, dependency-free **`htmlwidget`**
+data explorer built from scratch in vanilla JavaScript (no React, no build
+toolchain). It is portable: render it in the RStudio/Positron Viewer, inside
+Shiny, in R Markdown / Quarto, or export it to a standalone HTML file.
 
-* **Drag-and-drop column reordering**: columns in the Data View table can be
-  rearranged by dragging their headers (powered by the DataTables 'ColReorder'
-  extension).
+* **`viewdt(data, options = viewdt_options())`** — opens the modern explorer.
+* **`viewdt_options()`** — configure theme, labels, hidden columns, NA string,
+  visual features, and the viewer-cap safeguard.
+* **`save_viewdt()`** — export any data frame to a portable, offline HTML grid.
 
-* **Copy Code button in the top bar**: one-click clipboard copy of the
-  generated 'dplyr' pipeline, placed alongside Done / Cancel for quick access.
+### Explorer features
 
-* **Download CSV button in the top bar**: exports the currently displayed
-  (filtered, sorted, and column-selected) data as a timestamped CSV file.
+* **Virtualized grid** that paints only visible cells, with sticky headers and
+  a sticky row-index column; click a row to pin it.
+* **Kaggle-style micro-dashboard headers**: data-type badges, mini
+  distribution spark-histograms (numeric) / top-category stacked bars
+  (categorical), and a colour-coded data-completeness (missingness) bar.
+* **Column metadata cards** on the info icon: rows, unique, missing %, and
+  Min/Mean/Median/Max or Top-5 categories.
+* **Data Insights drawer** with an interactive SVG histogram (numeric) or
+  Pareto bar chart (categorical), completeness meter, and descriptive stats.
+* **Visual query builder**: multi-condition AND/OR filters with type-aware
+  operators and a searchable multi-select for categorical columns.
+* **Column visibility picker** and **global search**.
+* **Reproducible code generator**: copy-pasteable **dplyr**, **base R**, and
+  **SQL** matching the active filter + visible-column state.
+* **Light / dark / auto theme**, variable-label display, and custom NA string.
 
-* **Automatic Find & Replace preview**: the preview table now updates
-  automatically as you type — the separate Preview button has been removed.
-
-* **Dynamic rows-per-page slider**: the maximum value now matches the actual
-  number of rows in the data rather than a fixed cap of 500.
-
-* **Column search in the sidebar**: a search box above the column checkbox
-  list lets you quickly locate columns in wide data frames.
-
-* **Smart filter value input**: the value field is hidden automatically when
-  the selected operator is *is NA* or *is not NA*, reducing visual clutter.
-
-* **Improved filter row layout**: each filter condition now uses a compact
-  two-row layout (column + logic connector on top; operator + value below)
-  that fits comfortably in the narrow sidebar.
-
-## Internal changes
-
-* Removed `install_viewr_deps()` (dependencies are declared in `DESCRIPTION`
-  and installed automatically by R).
-* `Language: en-GB` declared in `DESCRIPTION`; `inst/WORDLIST` added for
-  technical terms.
-* `.Rbuildignore` updated to exclude `.claude/` from the source tarball.
-
----
+The legacy Shiny-gadget editor remains available as `ViewR()`.
 
 # ViewR 0.2.0
 

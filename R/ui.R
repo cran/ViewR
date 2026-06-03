@@ -5,25 +5,21 @@
 
 
 #' Build the ViewR Shiny UI
-#' @param data      original data.frame
-#' @param title     window title string
-#' @param theme     shinythemes theme name
-#' @param edit_mode logical - show Edit tab
-#' @param gen_code  logical - show R Code tab
-#' @param n_rows    integer - row count of original data (drives slider max)
+#' @param data          original data.frame
+#' @param title         window title string
+#' @param theme         shinythemes theme name
+#' @param edit_mode     logical - show Edit tab
+#' @param gen_code      logical - show R Code tab
 #' @noRd
-.vr_ui <- function(data, title, theme, edit_mode, gen_code, n_rows) {
+.vr_ui <- function(data, title, theme, edit_mode, gen_code) {
 
   col_names <- names(data)
-  pg_max  <- max(n_rows, 10L)
-  pg_val  <- min(25L, n_rows)
-  pg_step <- if (n_rows <= 100L) 5L else if (n_rows <= 1000L) 25L else 100L
 
   shiny::fluidPage(
     theme = shinythemes::shinytheme(theme),
     shinyjs::useShinyjs(),
 
-    # -- Custom CSS & JS -------------------------------------------------------
+    # -- Custom CSS ------------------------------------------------------------
     shiny::tags$head(
       shiny::tags$style(shiny::HTML(.vr_css(theme))),
       shiny::tags$script(shiny::HTML(.vr_js()))
@@ -32,23 +28,16 @@
     # -- Top bar ---------------------------------------------------------------
     shiny::div(
       class = "vr-topbar",
-      shiny::div(class = "vr-title",
-                 shiny::icon("table"), " ", title),
-      shiny::div(class = "vr-status",
-                 shiny::textOutput("vr_status", inline = TRUE)),
+      shiny::div(
+        class = "vr-title",
+        shiny::icon("table"), " ", title
+      ),
+      shiny::div(
+        class = "vr-status",
+        shiny::textOutput("vr_status", inline = TRUE)
+      ),
       shiny::div(
         class = "vr-actions",
-        if (gen_code) shiny::actionButton(
-          "vr_topbar_copy", NULL,
-          icon  = shiny::icon("copy"),
-          class = "btn-info btn-sm",
-          title = "Copy R code to clipboard"
-        ),
-        shiny::downloadButton(
-          "vr_download_csv", NULL,
-          class = "btn-default btn-sm vr-dl-btn",
-          title = "Download displayed data as CSV"
-        ),
         shiny::actionButton("vr_done",   "Done",
                             class = "btn-success btn-sm",
                             icon  = shiny::icon("check")),
@@ -61,19 +50,19 @@
     # -- Body: sidebar + main panel --------------------------------------------
     shiny::fluidRow(
 
-      # ====================================================================
+      # ====================================
       # SIDEBAR
-      # ====================================================================
+      # ====================================
       shiny::column(
         width = 3,
         class = "vr-sidebar",
 
-        # -- Filters --------------------------------------------------------
+        # -- Filters ----------------------------------------------------------
         shiny::div(
           class = "vr-panel",
           shiny::div(
             class = "vr-panel-header",
-            shiny::icon("filter"), " Filters",
+            shiny::icon("filter"), "Filters",
             shiny::div(
               class = "pull-right",
               shiny::actionButton("vr_add_filter", NULL,
@@ -95,12 +84,12 @@
           )
         ),
 
-        # -- Sort -----------------------------------------------------------
+        # -- Sort --------------------------------------------------------------
         shiny::div(
           class = "vr-panel",
           shiny::div(
             class = "vr-panel-header",
-            shiny::icon("sort"), " Sort",
+            shiny::icon("sort"), "Sort",
             shiny::div(
               class = "pull-right",
               shiny::actionButton("vr_add_sort", NULL,
@@ -122,12 +111,12 @@
           )
         ),
 
-        # -- Column visibility ----------------------------------------------
+        # -- Column visibility -------------------------------------------------
         shiny::div(
           class = "vr-panel",
           shiny::div(
             class = "vr-panel-header",
-            shiny::icon("columns"), " Columns",
+            shiny::icon("columns"), "Columns",
             shiny::div(
               class = "pull-right",
               shiny::actionButton("vr_cols_all",  "All",
@@ -135,12 +124,6 @@
               shiny::actionButton("vr_cols_none", "None",
                                   class = "btn-xs btn-link mb-0")
             )
-          ),
-          shiny::tags$input(
-            type        = "text",
-            id          = "vr_col_search",
-            class       = "form-control vr-col-search",
-            placeholder = "Search columns\u2026"
           ),
           shiny::div(
             class = "vr-col-list",
@@ -153,33 +136,30 @@
           )
         ),
 
-        # -- Display options ------------------------------------------------
+        # -- Display options ---------------------------------------------------
         shiny::div(
           class = "vr-panel",
           shiny::div(class = "vr-panel-header",
-                     shiny::icon("sliders-h"), " Display"),
+                     shiny::icon("sliders-h"), "Display"),
           shiny::sliderInput("vr_page_length", "Rows per page:",
-                             min   = 5L,
-                             max   = pg_max,
-                             value = pg_val,
-                             step  = pg_step),
+                             min = 5, max = 500, value = 25, step = 5),
           shiny::checkboxInput("vr_show_labels",
                                "Show variable labels", value = TRUE),
           shiny::checkboxInput("vr_show_rownames",
-                               "Show row index",       value = TRUE)
+                               "Show row index", value = TRUE)
         )
       ),   # end sidebar column
 
-      # ====================================================================
+      # ====================================
       # MAIN PANEL
-      # ====================================================================
+      # ====================================
       shiny::column(
         width = 9,
 
         shiny::tabsetPanel(
           id = "vr_tabs",
 
-          # -- Data View ----------------------------------------------------
+          # -- Data View ------------------------------------------------------
           shiny::tabPanel(
             title = shiny::tagList(shiny::icon("table"), " Data"),
             value = "tab_view",
@@ -187,46 +167,7 @@
             DT::dataTableOutput("vr_table")
           ),
 
-          # -- Plots --------------------------------------------------------
-          shiny::tabPanel(
-            title = shiny::tagList(shiny::icon("chart-bar"), " Plots"),
-            value = "tab_plots",
-            shiny::br(),
-            shiny::fluidRow(
-              shiny::column(
-                3,
-                shiny::wellPanel(
-                  shiny::selectInput("vr_plot_col", "Column:",
-                                     choices = col_names,
-                                     width   = "100%"),
-                  shiny::radioButtons(
-                    "vr_plot_type", "Plot type:",
-                    choices  = c("Auto-detect" = "auto",
-                                 "Histogram"   = "hist",
-                                 "Bar chart"   = "bar",
-                                 "Boxplot"     = "box"),
-                    selected = "auto"
-                  ),
-                  shiny::conditionalPanel(
-                    condition = paste0("input.vr_plot_type == 'hist' || ",
-                                       "input.vr_plot_type == 'auto'"),
-                    shiny::sliderInput("vr_plot_bins", "Bins:",
-                                       min = 5, max = 100, value = 30, step = 5)
-                  )
-                )
-              ),
-              shiny::column(
-                9,
-                shiny::plotOutput("vr_plot_out", height = "380px"),
-                shiny::div(
-                  class = "vr-plot-summary",
-                  shiny::verbatimTextOutput("vr_plot_summary")
-                )
-              )
-            )
-          ),
-
-          # -- Edit (Excel-like) --------------------------------------------
+          # -- Edit (Excel-like) ----------------------------------------------
           if (edit_mode) shiny::tabPanel(
             title = shiny::tagList(shiny::icon("edit"), " Edit"),
             value = "tab_edit",
@@ -251,10 +192,11 @@
                 "Click a cell to edit. Changes apply when you click \u2018Done\u2019."
               )
             ),
-            rhandsontable::rHandsontableOutput("vr_hot", height = "500px")
+            rhandsontable::rHandsontableOutput("vr_hot",
+                                               height = "500px")
           ),
 
-          # -- Find & Replace (auto-preview, no Preview button) -------------
+          # -- Find & Replace -------------------------------------------------
           shiny::tabPanel(
             title = shiny::tagList(shiny::icon("search"), " Find & Replace"),
             value = "tab_fnr",
@@ -283,7 +225,10 @@
                     )
                   ),
                   shiny::div(
-                    style = "margin-top:6px;",
+                    style = "display:flex; gap:6px; margin-top:6px;",
+                    shiny::actionButton("vr_fnr_preview", "Preview",
+                                        icon  = shiny::icon("eye"),
+                                        class = "btn-default btn-sm"),
                     shiny::actionButton("vr_fnr_apply", "Apply",
                                         icon  = shiny::icon("check"),
                                         class = "btn-primary btn-sm")
@@ -298,7 +243,7 @@
                     shiny::tags$b("Preview of changes"),
                     shiny::tags$small(
                       class = "text-muted",
-                      " (updates as you type):"
+                      " (showing matched cells only):"
                     ),
                     shiny::br(), shiny::br(),
                     DT::dataTableOutput("vr_fnr_preview_tbl")
@@ -310,14 +255,14 @@
                     class = "text-muted-sm",
                     style = "padding:20px 0; color:#aaa; text-align:center;",
                     shiny::icon("search"),
-                    " Enter a search term to see matches automatically."
+                    " Enter a search term and click Preview to see matches."
                   )
                 )
               )
             )
           ),
 
-          # -- Variable Info ------------------------------------------------
+          # -- Variable Info --------------------------------------------------
           shiny::tabPanel(
             title = shiny::tagList(shiny::icon("info-circle"), " Variable Info"),
             value = "tab_info",
@@ -325,7 +270,7 @@
             DT::dataTableOutput("vr_var_info_tbl")
           ),
 
-          # -- R Code -------------------------------------------------------
+          # -- R Code --------------------------------------------------------
           if (gen_code) shiny::tabPanel(
             title = shiny::tagList(shiny::icon("code"), " R Code"),
             value = "tab_code",
@@ -357,13 +302,14 @@
 # -- Inline JavaScript ---------------------------------------------------------
 .vr_js <- function() {
   "
-// ---- Clipboard ---------------------------------------------------------------
+// Copy-to-clipboard helper called from R via shinyjs::runjs()
 function vrCopyCode(text) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(function() {
       Shiny.setInputValue('vr_clipboard_done', Math.random());
     });
   } else {
+    // Fallback for older browsers
     var ta = document.createElement('textarea');
     ta.value = text;
     document.body.appendChild(ta);
@@ -373,26 +319,5 @@ function vrCopyCode(text) {
     Shiny.setInputValue('vr_clipboard_done', Math.random());
   }
 }
-
-// ---- Column search in sidebar -----------------------------------------------
-$(document).on('input', '#vr_col_search', function() {
-  var q = $(this).val().toLowerCase();
-  $('#vr_visible_cols .checkbox').each(function() {
-    var lbl = $(this).text().toLowerCase();
-    $(this).toggle(q === '' || lbl.indexOf(q) !== -1);
-  });
-});
-
-// ---- Hide value input for is-NA / is-not-NA operators ----------------------
-$(document).on('change', 'select[id^=\"f_op_\"]', function() {
-  var op  = $(this).val();
-  var row = $(this).closest('.vr-filter-row');
-  var val = row.find('.vr-filter-val');
-  if (op === 'is NA' || op === 'is not NA') {
-    val.hide();
-  } else {
-    val.show();
-  }
-});
   "
 }
